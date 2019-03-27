@@ -1,0 +1,12 @@
+{
+	"client": "client/",
+	"svr": "server/",
+	"miniprogramRoot": "client/",
+	"qcloudRoot": "server/",
+	"setting": {
+		"newFeature": true
+	},
+	"appid": "wxfeeb9feaedb74334",
+	"projectname": "udacity-mall",
+	"condition": {}
+}
