@@ -32,4 +32,10 @@ router.get('/message', controllers.message.get)
 // POST 用来处理微信转发过来的客服消息
 router.post('/message', controllers.message.post)
 
+// 服务器回对一种特定的请求，执行我们刚刚在controllers.product文件中实现的list相关的功能
+
+// 这个请求有两个要求
+// 第一需要是一个get请求，也就是下载数据的请求，我们在这里明确定义，同时这个请求// 链接需要是这样的形式
+router.get('/product', controllers.product.list)
+
 module.exports = router
