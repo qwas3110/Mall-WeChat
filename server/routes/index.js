@@ -38,4 +38,7 @@ router.post('/message', controllers.message.post)
 // 第一需要是一个get请求，也就是下载数据的请求，我们在这里明确定义，同时这个请求// 链接需要是这样的形式
 router.get('/product', controllers.product.list)
 
+// 获取商品详情
+router.get('/product/:id', controllers.product.detail)
+
 module.exports = router
