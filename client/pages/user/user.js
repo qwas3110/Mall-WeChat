@@ -2,70 +2,70 @@
 const qcloud = require('../../vendor/wafer2-client-sdk/index.js')
 const config = require('../../config.js')
 
-
 Page({
-  data: {
-    userInfo: null,
-  },
+	data: {
+		userInfo:null
+	},
 
 	onLoad() {
+		// 在onload中调用。
+		// 这样在页面初始会检查用户是否登陆，是否处在一个会话当中
+		
 		this.checkSession({
-			success: ({ userInfo }) => {
-				this.setData({
-					userInfo
-				})
+			// 设置成功时的回调函数
+			success: ({userInfo}) => {
+				this.setData({userInfo:userInfo})
+			},
+			error: () => {
+				
+			}
+		})
+	},
+	opTapAddress() {
+		wx.showToast({
+			title: '此功能暂未开放',
+			icon: 'none'
+		})
+	},
+	// 执行会话检查
+	checkSession({success,error}) {
+		wx.checkSession({
+			// 当成功我们希望调用getuserInfo 自动加载用户信息
+			success: () => {
+				this.getUserInfo({success,error})
 			},
 
-		error: () => {
-			
-		}
+			fail: () => {
+				error && error()
+			}
+		})
+	},
+	opTapKf() {
+		wx.showToast({
+			title: '此功能暂未开放',
+			icon: 'none'
+		})
+	},
+	onTapLogin() {
+		this.doQcloudLogin({
+			success: ({ userInfo }) => {
+				this.setData({userInfo})
+			}
 		})
 	},
 
-  onTapAddress() {
-    wx.showToast({
-      title: '此功能暂未开放',
-      icon: 'none'
-    })
-  },
-
-  onTapKf() {
-    wx.showToast({
-      title: '此功能暂未开放',
-      icon: 'none'
-    })
-  },
-  onTapLogin() {
-		this.doQcloudLogin({
-			success: ({ userInfo }) => {
-				this.setData({
-					userInfo
-				})
-			}
-		})
-  },
-  onGotUserInfo: function(e) {
-    console.log(e.detail.errMsg)
-    console.log(e.detail.userInfo)
-    console.log(e.detail.rawData)
-  },
-  // 设置下载的url，请求成功及失败对应的回调函数
-	// 只有用户本人能下载他自己的数据，设置参数login
-	// 小程序默认只有第一次登陆时，才会返回登陆数据，否则数据为空
-	// 所以设置在非第一次登陆下，再调用获取个人信息的功能
+	// 加载用户信息
 	getUserInfo({success,error}) {
 		qcloud.request({
 			url: config.service.requestUrl,
 			login: true,
 			success: result => {
-				let date = result.data
+				let data = result.data;
 
-				if (!date.code) {
-					let userInfo = date.data
+				if (!data.code) {
+					let userInfo = data.data;
 
-					success && success({
-						userInfo
-					})
+					success && success({userInfo})
 				} else {
 					error && error()
 				}
@@ -75,33 +75,22 @@ Page({
 			}
 		})
 	},
-	doQcloudLogin({ success, erroor }) {
+
+	// 封装登陆代码
+	doQcloudLogin({success,error}) {
+		// 调用qcloud 登陆接口
 		qcloud.login({
-			success: res => {
-				if (res) {
-					let userInfo = res
-					success && success({
-						userInfo
-					})
+			success: result => {
+				if (result) {
+					let userInfo = result;
+					success && success({userInfo})
 				} else {
-					// 如果不是首次登陆，不会返回用户信息，请求用户信息接口获取
-					this.getUserInfo({success,erroor})
+					// 不是首次登陆，不会返回用户信息
+					this.getUserInfo({success,error})
 				}
 			},
-			fail: () => {
-				erroor & erroor()
-			}
-		})
-	},
-  // 执行会话检查功能
-	checkSession({success,error}) {
-		wx.checkSession({
-			success: () => {
-				this.getUserInfo({success,error})
-			},
-			fail: () => {
-				error && error()
-			}
+			fail: () => {error && error()}
 		})
 	}
+	
 })
