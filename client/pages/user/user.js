@@ -2,9 +2,15 @@
 const qcloud = require('../../vendor/wafer2-client-sdk/index.js')
 const config = require('../../config.js')
 
+const UNPROMPTED = 0
+const UNAUTHORIZED = 1
+const AUTHORIZED = 2
+
+
 Page({
 	data: {
-		userInfo:null
+		userInfo:null,
+		locationAuthType: UNPROMPTED
 	},
 
 	onLoad() {
@@ -17,7 +23,7 @@ Page({
 				this.setData({userInfo:userInfo})
 			},
 			error: () => {
-				
+
 			}
 		})
 	},
@@ -47,9 +53,11 @@ Page({
 		})
 	},
 	onTapLogin() {
-		this.doQcloudLogin({
+		this.login({
 			success: ({ userInfo }) => {
-				this.setData({userInfo})
+				this.setData({
+					userInfo:userInfo
+				})
 			}
 		})
 	},
@@ -91,6 +99,35 @@ Page({
 			},
 			fail: () => {error && error()}
 		})
-	}
+	},
 	
+	// 处理用户登陆授权逻辑
+	login({success,error}) {
+		wx.getSetting({
+			success: res => {
+				if (res.authSetting['scope.userInfo'] === false) {
+					this.setData({
+						locationAuthType: UNAUTHORIZED
+					})
+					// 已拒绝授权
+					wx.showModal({
+						title: '提示',
+						content: '请授权我们获取你的用户信息',
+						showCancel: false,
+						success: () => {
+							wx.openSetting({
+								success: res => {
+									if (res.authSetting['scope.userInfo'] === true) {
+										this.doQcloudLogin({success,error})
+									}
+								}
+							})
+						}
+					})
+				} else {
+					this.doQcloudLogin({success,error})
+				}
+			}
+		})
+	}
 })
