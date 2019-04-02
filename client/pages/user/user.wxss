@@ -1,6 +1,8 @@
+/* pages/user/user.wxss */
+
 .user-card {
   margin: 50rpx 27rpx 0;
-  background: #fff;
+  background: #FFFFFF;
   box-shadow: 0 2rpx 13rpx 5rpx rgba(0, 0, 0, 0.02);
   border-radius: 13rpx;
 }
@@ -16,7 +18,7 @@
   margin-left: 53rpx;
   height: 100rpx;
   width: 100rpx;
-  background: #f5e069;
+  background: #F5E069;
   border-radius: 50%;
 }
 
@@ -31,7 +33,7 @@
 
 .user-split {
   height: 8rpx;
-  background: #f9f9f9;
+  background: #F9F9F9;
 }
 
 .user-options .option {

@@ -1,23 +1,12 @@
 //app.js
-var qcloud = require('./vendor/wafer2-client-sdk/index');
-var config = require('./config');
+var qcloud = require('./vendor/wafer2-client-sdk/index')
+var config = require('./config')
 
-let userInfo;
-
-const UNPROMPTED = 0;
-const UNAUTHORIZED = 1;
-const AUTHORIZED = 2;
-
-
-
+let userInfo
 
 App({
   onLaunch: function() {
     qcloud.setLoginUrl(config.service.loginUrl)
-  },
-
-  data: {
-    locationAuthType: UNPROMPTED
   },
 
   login({
@@ -27,17 +16,25 @@ App({
     wx.getSetting({
       success: res => {
         if (res.authSetting['scope.userInfo'] === false) {
-
-          this.data.locationAuthType = UNAUTHORIZED
           // 已拒绝授权
           wx.showModal({
             title: '提示',
             content: '请授权我们获取您的用户信息',
-            showCancel: false
+            showCancel: false,
+            success: () => {
+              wx.openSetting({
+                success: res => {
+                  if (res.authSetting['scope.userInfo'] === true) {
+                    this.doQcloudLogin({
+                      success,
+                      error
+                    })
+                  }
+                }
+              })
+            }
           })
-          error && error()
         } else {
-          this.data.locationAuthType = AUTHORIZED
           this.doQcloudLogin({
             success,
             error
@@ -55,7 +52,8 @@ App({
     qcloud.login({
       success: result => {
         if (result) {
-          let userInfo = result
+          userInfo = result
+
           success && success({
             userInfo
           })
@@ -86,7 +84,7 @@ App({
         let data = result.data
 
         if (!data.code) {
-          let userInfo = data.data
+          userInfo = data.data
 
           success && success({
             userInfo
@@ -101,29 +99,35 @@ App({
     })
   },
 
-	checkSession({ success, error }) {
+  checkSession({
+    success,
+    error
+  }) {
+    if (userInfo) {
+      return success && success({
+        userInfo
+      })
+    }
 
-		if (userInfo) {
-			return success && success({userInfo})
+    wx.checkSession({
+      success: () => {
+        this.getUserInfo({
+          success: res => {
+            userInfo = res.userInfo
 
-			wx.checkSession({
-				success: () => {
-					this.getUserInfo({
-						success: res => {
-							userInfo = res.userInfo
+            success && success({
+              userInfo
+            })
+          },
+          fail: () => {
+            error && error()
+          }
+        })
+      },
+      fail: () => {
+        error && error()
+      }
+    })
+  }
 
-							success && success({userInfo})
-						},
-						fail: () => {
-							error && error()
-						}
-					})
-				},
-				fail: () => {
-					error && error()
-				}
-			})
-		}
-
-	},
 })
