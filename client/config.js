@@ -3,7 +3,7 @@
  */
 
 // 此处主机域名修改成腾讯云解决方案分配的域名
-var host = 'https://lupqvzl3.qcloud.la';
+var host = 'https://lupqvzl3.qcloud.la/';
 
 var config = {
 
@@ -27,7 +27,10 @@ var config = {
 				productList: `${host}/weapp/product`,
 
 				// 获取商品详情
-				productDetail: `${host}/weapp/product/`
+				productDetail: `${host}/weapp/product/`,
+
+				// 拉取用户信息
+				user: `${host}/weapp/user`
     }
 };
 
